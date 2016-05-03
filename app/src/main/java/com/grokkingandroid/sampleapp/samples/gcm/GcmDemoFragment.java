@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -53,6 +54,10 @@ public class GcmDemoFragment extends DemoBaseFragment implements
    private TextView mTxtRegId;
    private TextView mTxtMsg;
    private State mState = State.UNREGISTERED;
+
+   String msgList[] = {"hello", "world", "cse", "110", "software", "engineering"};
+   int index = 0;
+
 
    public static GcmDemoFragment newInstance() {
       return new GcmDemoFragment();
@@ -161,7 +166,19 @@ public class GcmDemoFragment extends DemoBaseFragment implements
             break;
          }
       } else if (view.getId() == R.id.btn_send_message) {
-         sendMessage();
+         index = 0;
+         final Handler handler = new Handler();
+         handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+               if (index < msgList.length) {
+                  sendMessage();
+                  handler.postDelayed(this, 5000);
+                  index++;
+               }
+
+            }
+         }, 5000);
       } else if (view.getId() == R.id.btn_select_account) {
          startAccountSelector();
       }
@@ -205,6 +222,8 @@ public class GcmDemoFragment extends DemoBaseFragment implements
       Intent msgIntent = new Intent(getActivity(), GcmIntentService.class);
       msgIntent.setAction(Constants.ACTION_ECHO);
       String msg;
+      String msgList[] = {"hello", "world", "cse", "110", "software", "engineering"};
+      /*
       if (!TextUtils.isEmpty(mTxtMsg.getText())) {
          msg = mTxtMsg.getText().toString();
          mTxtMsg.setText("");
@@ -212,8 +231,11 @@ public class GcmDemoFragment extends DemoBaseFragment implements
       else {
          msg = getActivity().getString(R.string.no_message);
       }
-      String msgTxt = getString(R.string.msg_sent, msg);
-      Crouton.showText(getActivity(), msgTxt, Style.INFO);            
+      */
+      String msgTxt;
+      msg = msgList[index];
+      msgTxt = getString(R.string.msg_sent, msg);
+      Crouton.showText(getActivity(), msgTxt, Style.INFO);
       msgIntent.putExtra(Constants.KEY_MESSAGE_TXT, msg);
       getActivity().startService(msgIntent);
    }
